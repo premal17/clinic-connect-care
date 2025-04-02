@@ -95,7 +95,7 @@ const DoctorDashboard = () => {
   return (
     <div className="container px-4 py-6 max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-clinic-secondary">Welcome, Dr. {user?.name}</h1>
+        <h1 className="text-3xl font-bold text-clinic-secondary">Welcome, Dr. {user?.full_name}</h1>
         <p className="text-gray-600">Here's your practice overview for today</p>
       </div>
 

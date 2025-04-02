@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -117,11 +116,11 @@ const DashboardSidebar = () => {
         )}>
           <div className={cn("flex", collapsed ? "justify-center" : "items-center space-x-3")}>
             <div className="w-10 h-10 rounded-full bg-clinic-secondary flex items-center justify-center">
-              <span className="text-white font-semibold">{user.name.charAt(0)}</span>
+              <span className="text-white font-semibold">{user.full_name?.charAt(0)}</span>
             </div>
             {!collapsed && (
               <div>
-                <p className="font-medium">{user.name}</p>
+                <p className="font-medium">{user.full_name}</p>
                 <p className="text-xs text-gray-500 capitalize">{user.role}</p>
               </div>
             )}
