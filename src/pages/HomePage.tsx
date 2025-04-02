@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import AppHeader from '@/components/layout/AppHeader';
 import AppFooter from '@/components/layout/AppFooter';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 const features = [
   {
@@ -83,11 +84,21 @@ const HomePage = () => {
                     Get Started
                   </Button>
                 </Link>
-                <Link to="/doctors">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 w-full sm:w-auto">
-                    Find a Doctor
-                  </Button>
-                </Link>
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Link to="/doctors">
+                      <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 w-full sm:w-auto">
+                        Find a Doctor
+                      </Button>
+                    </Link>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80 bg-white text-clinic-secondary p-4">
+                    <div className="flex flex-col space-y-2">
+                      <h3 className="text-lg font-semibold">Find the Right Specialist</h3>
+                      <p className="text-sm text-gray-600">Browse our network of qualified healthcare professionals and book an appointment instantly.</p>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               </div>
             </div>
           </div>
