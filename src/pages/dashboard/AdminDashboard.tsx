@@ -6,7 +6,8 @@ import {
   Clock, 
   ChevronRight,
   CheckCircle,
-  XCircle
+  XCircle,
+  Settings  // Add this import
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
