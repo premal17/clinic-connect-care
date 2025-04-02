@@ -85,8 +85,8 @@ const doctorsData = [
 
 const DoctorsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [availability, setAvailability] = useState('');
+  const [specialty, setSpecialty] = useState('all');
+  const [availability, setAvailability] = useState('any');
   
   // Filter doctors based on search term and filters
   const filteredDoctors = doctorsData.filter(doctor => {
@@ -95,10 +95,10 @@ const DoctorsPage = () => {
                           doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Filter by specialty
-    const matchesSpecialty = specialty === '' || doctor.specialty === specialty;
+    const matchesSpecialty = specialty === 'all' || doctor.specialty === specialty;
     
     // Filter by availability
-    const matchesAvailability = availability === '' || doctor.availability.includes(availability);
+    const matchesAvailability = availability === 'any' || doctor.availability.includes(availability === 'today' ? 'Today' : 'Tomorrow');
     
     return matchesSearch && matchesSpecialty && matchesAvailability;
   });
@@ -138,7 +138,7 @@ const DoctorsPage = () => {
                     <SelectValue placeholder="Specialty" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Specialties</SelectItem>
+                    <SelectItem value="all">All Specialties</SelectItem>
                     <SelectItem value="Cardiologist">Cardiologist</SelectItem>
                     <SelectItem value="Dermatologist">Dermatologist</SelectItem>
                     <SelectItem value="Pediatrician">Pediatrician</SelectItem>
@@ -152,9 +152,9 @@ const DoctorsPage = () => {
                     <SelectValue placeholder="Availability" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any Availability</SelectItem>
-                    <SelectItem value="Today">Available Today</SelectItem>
-                    <SelectItem value="Tomorrow">Available Tomorrow</SelectItem>
+                    <SelectItem value="any">Any Availability</SelectItem>
+                    <SelectItem value="today">Available Today</SelectItem>
+                    <SelectItem value="tomorrow">Available Tomorrow</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button variant="outline" size="icon" className="sm:inline-flex hidden">
