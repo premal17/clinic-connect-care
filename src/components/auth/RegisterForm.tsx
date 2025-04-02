@@ -10,9 +10,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  full_name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
@@ -26,13 +27,14 @@ type FormValues = z.infer<typeof formSchema>;
 
 const RegisterForm = () => {
   const { toast } = useToast();
+  const { register } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
+      full_name: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -43,9 +45,16 @@ const RegisterForm = () => {
   async function onSubmit(data: FormValues) {
     setIsLoading(true);
     try {
-      // In a real app, we'd make an API call here
-      // For now, simulate registration with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Create the userData object in the format expected by the API
+      const userData = {
+        full_name: data.full_name,
+        email: data.email,
+        password: data.password,
+        role: data.role
+      };
+      
+      // Call the register function from AuthContext
+      await register(userData);
       
       toast({
         title: 'Registration Successful',
@@ -53,9 +62,10 @@ const RegisterForm = () => {
       });
       navigate('/login');
     } catch (error) {
+      console.error('Registration error:', error);
       toast({
         title: 'Registration Failed',
-        description: 'Please try again later',
+        description: error instanceof Error ? error.message : 'Please try again later',
         variant: 'destructive',
       });
     } finally {
@@ -76,7 +86,7 @@ const RegisterForm = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="full_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>

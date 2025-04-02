@@ -50,8 +50,17 @@ export const authService = {
   },
   
   register: async (userData: any) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
+    try {
+      const response = await api.post('/auth/register', userData);
+      return response.data;
+    } catch (error: any) {
+      // Enhance error handling to provide more descriptive errors
+      if (error.response && error.response.data) {
+        const errorMsg = error.response.data.detail || 'Registration failed';
+        throw new Error(errorMsg);
+      }
+      throw error;
+    }
   },
   
   logout: () => {
