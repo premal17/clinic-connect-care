@@ -1,88 +1,94 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService } from '@/services/api';
 
-export type UserRole = 'patient' | 'doctor' | 'admin';
+// Define user types
+type UserRole = 'patient' | 'doctor' | 'admin';
 
-export interface User {
-  id: string;
-  name: string;
+interface User {
+  id: number;
   email: string;
+  full_name: string;
   role: UserRole;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
   isLoading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: any) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is stored in localStorage (simulating persistence)
-    const storedUser = localStorage.getItem('clinic_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Check if user is logged in
+    const checkUser = () => {
+      const storedUser = authService.getCurrentUser();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+      setIsLoading(false);
+    };
+
+    checkUser();
   }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
     try {
-      // In a real app, we'd make an API call here
-      // For now, simulate successful login with mock data
-      
-      // Determine role based on email (just for demo)
-      let role: UserRole = 'patient';
-      if (email.includes('doctor')) {
-        role = 'doctor';
-      } else if (email.includes('admin')) {
-        role = 'admin';
-      }
-      
-      const mockUser: User = {
-        id: '123456',
-        name: email.split('@')[0],
-        email,
-        role,
-      };
-      
-      // Simulate delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Save user to localStorage
-      localStorage.setItem('clinic_user', JSON.stringify(mockUser));
-      setUser(mockUser);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+      setIsLoading(true);
+      setError(null);
+      const data = await authService.login(email, password);
+      setUser(data.user);
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Login failed');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (userData: any) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      await authService.register(userData);
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Registration failed');
+      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('clinic_user');
+    authService.logout();
     setUser(null);
   };
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const value = {
+    user,
+    isLoading,
+    error,
+    login,
+    register,
+    logout
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
