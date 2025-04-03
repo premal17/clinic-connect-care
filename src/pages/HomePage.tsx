@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -82,6 +83,12 @@ const HomePage = () => {
                 <Link to="/register" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto">
                     Get Started
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link to="/doctors" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 w-full sm:w-auto">
+                    Find a Doctor
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>
