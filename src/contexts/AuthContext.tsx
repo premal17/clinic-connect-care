@@ -31,11 +31,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check if user is logged in
     const checkUser = () => {
-      const storedUser = authService.getCurrentUser();
-      if (storedUser) {
-        setUser(storedUser);
+      try {
+        const storedUser = authService.getCurrentUser();
+        if (storedUser) {
+          setUser(storedUser);
+        }
+      } catch (err) {
+        console.error("Error loading user from localStorage:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     checkUser();
@@ -47,8 +52,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       const data = await authService.login(email, password);
       setUser(data.user);
+      return data;
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed');
+      console.error("Login error:", err);
+      setError(err.message || 'Login failed');
       throw err;
     } finally {
       setIsLoading(false);
@@ -59,9 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      await authService.register(userData);
+      return await authService.register(userData);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      console.error("Registration error:", err);
+      setError(err.message || 'Registration failed');
       throw err;
     } finally {
       setIsLoading(false);

@@ -31,22 +31,27 @@ api.interceptors.request.use(
 // API service functions
 export const authService = {
   login: async (email: string, password: string) => {
-    const formData = new FormData();
-    formData.append('username', email);
-    formData.append('password', password);
-    
-    const response = await api.post('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-    
-    if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    try {
+      // Use JSON format instead of FormData for login
+      const response = await api.post('/auth/login', {
+        username: email,
+        password: password
+      });
+      
+      if (response.data.access_token) {
+        localStorage.setItem('token', response.data.access_token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      // Enhance error handling
+      if (error.response && error.response.data) {
+        const errorMsg = error.response.data.detail || 'Login failed';
+        throw new Error(errorMsg);
+      }
+      throw error;
     }
-    
-    return response.data;
   },
   
   register: async (userData: any) => {

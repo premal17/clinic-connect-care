@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -23,6 +25,7 @@ const LoginForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -34,6 +37,8 @@ const LoginForm = () => {
 
   async function onSubmit(data: FormValues) {
     setIsLoading(true);
+    setLoginError(null);
+    
     try {
       await login(data.email, data.password);
       toast({
@@ -42,6 +47,8 @@ const LoginForm = () => {
       });
       navigate('/dashboard');
     } catch (error) {
+      console.error('Login error:', error);
+      setLoginError(error instanceof Error ? error.message : 'Invalid credentials');
       toast({
         title: 'Login Failed',
         description: 'Please check your credentials and try again',
@@ -61,6 +68,13 @@ const LoginForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {loginError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{loginError}</AlertDescription>
+          </Alert>
+        )}
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
